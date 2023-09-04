@@ -12,7 +12,7 @@ struct graph
 {
 int estado;
 char individuo;
-struct graph **prox;
+struct graph **adj;
 }graph;
 
 struct list
@@ -23,30 +23,30 @@ int size;
 
 struct graph *graphCreate(int linhas);
 struct list *listInit(int linhas);
-int num_linhas(char *name_arq);
-// void listaAddFinal(list *L, int valor);
-// void listaImprimir(list *L);
-// void listFree(struct list *L);
+int num_lines(char *name_arq);
+// void graphAdd(list *L, char individuo, int estado);
+void listFree(struct list **L);
 
 
 struct graph *graphCreate(int linhas)
 {
-struct graph *G =(struct graph *)calloc(1, sizeof(struct graph));
-G->prox = (struct graph **)calloc(linhas, sizeof(struct graph *));
+  struct graph *G =(struct graph *)calloc(1, sizeof(struct graph));
+  G->adj = (struct graph **)calloc(linhas, sizeof(struct graph *));
 
-return G; 
+  return G; 
 }
 
 
 struct list *listInit(int linhas)
 {
-struct list *L =(struct list *)calloc(1, sizeof(struct list));
-L->size++;
+  struct list *L =(struct list *)calloc(1, sizeof(struct list));
+  L->ref = graphCreate(linhas);
+  L->size = linhas;
 
-return L;
+  return L;
 }
 
-int num_linhas(char *name_arq){
+int num_lines(char *name_arq){
   
   int linhas=0;
   char referencia[12];  
@@ -66,7 +66,9 @@ int num_linhas(char *name_arq){
 
 return linhas;
 }
-// void listaAddFinal(list *L, int valor)
+
+
+// void graphAdd(list *L, char individuo, int estado)
 // {
 //   grafo *aux = L->ref;
 //   while(aux->prox != NULL)
@@ -78,37 +80,29 @@ return linhas;
 //   return;
 // }
 
-// void listaImprimir(list *L)
-// {
-// grafo *aux = L->ref;
-// printf("\nTAMANHO: %d\n", L->size);
-// while(aux != NULL)
-//   {
-//   printf("[%d]->", aux->estado);
-//   aux = aux->prox;
-//   }
-// printf("[NULL]\n\n");
-// }
 
-// void listFree(struct list *L)
-// {
-// struct graph *aux = L->ref;
-// for(int f = 1; f <= L->size; f++)
-//   {
-//   L->ref = aux->prox;
-//   free(aux);
-//   aux = L->ref;
-//   }
+void listFree(struct list **L)
+{
+  struct graph *aux = (*L)->ref;
+  struct graph **ref = aux->adj;
 
-// free(L);
-// L = NULL;
-// }
+  for(int n=0; n < (*L)->size; n++){
+    free(ref[n]);
+    ref[n] = NULL;
+  }
+  free(aux);
+  free(*L);
+  aux = NULL;
+  *L = NULL;
+
+}
+
 
 int main(){
 
-  int linhas = num_linhas("banco.csv");
-
-  printf("%d", linhas);
+  int linhas = num_lines("banco.csv");
+  struct list *L = listInit(linhas); 
+  listFree(&L);
 
 return 0;   
 }
