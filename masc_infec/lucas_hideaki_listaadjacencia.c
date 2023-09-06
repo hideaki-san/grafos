@@ -132,12 +132,17 @@ void graphPrint(struct list *L){
     g = L->adj[n];
     while(g != NULL){
       printf("%c,%d  ", g->individuo, g->estado);
-      state[state_controller] = g->estado;
-      state_controller++;
+
+      if(state_controller < 2){
+        state[state_controller] = g->estado;
+        state_controller++;
+      }
+
       g = g->next;
     }
-
-  conditional(state[0], state[1]);
+  if(state_controller == 2)
+    conditional(state[0], state[1]);
+  
   state_controller = 0;
   printf("\n");
   }
