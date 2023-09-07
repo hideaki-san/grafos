@@ -1,13 +1,6 @@
 #include<stdlib.h>
 #include<stdio.h>
 
-/*
-1 - Sem máscara, sem infecção da COVID-19
-2 - Com máscara, sem infecção da COVID-19
-3 - Com máscara, com infecção da COVID-19
-4 - Sem máscara, com infecção da COVID-19
-*/
-
 struct graph
 {
 int estado;
@@ -199,15 +192,17 @@ void listFree(struct list **L)
 
 int main(){
 
-  int lines = num_lines("banco.csv");
+  char name_arq[20] = "banco.csv";
+
+  int lines = num_lines(name_arq);
 
   struct list *L = listInit(lines);
   
-  FILE *arq = fopen("banco.csv", "r");
+  FILE *arq = fopen(name_arq, "r");
   
   if(arq == NULL){
     printf("erro.\n");
-    return 1;
+    return 0;
   }
 
   graphPopulate(&L, arq);
