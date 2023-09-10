@@ -18,13 +18,19 @@ int size_vertex;
 
 
 struct list *listInit(int lines);
-int num_lines(char *name_arq);
 struct graph *graphAdd(char individuo);
-void listFree(struct list **L);
-void graphPrint(struct list *L);
+int num_lines(char *name_arq);
 void graphPopulate(struct list **L, FILE *arq);
+void graphPrint(struct list *L);
+void listFree(struct list **L);
+
 //bool graphConexo(struct list *L);
 bool graphLoop(struct list *L);
+void graphDegree(struct list *L);
+bool graphParalel(struct list *L);
+void graphMinMaxDegree(struct list *L);
+int graphOrdem(struct list *L);
+bool graphSimples(struct list *L);
 
 
 struct list *listInit(int lines)
@@ -118,8 +124,10 @@ void graphPopulate(struct list **L, FILE *arq)
 
             for(int n = 0; n <= vertex_controller; n++)
             {
-                if(c == (*L)->buffer_vertex[n])
+                if(c == (*L)->buffer_vertex[n]){
                     vertex_add = 1;
+                    n = vertex_controller;
+                }
             }
 
             if(vertex_add != 1)
@@ -192,6 +200,9 @@ void listFree(struct list **L)
 //2)
 bool graphLoop(struct list *L)
 { 
+    if(L == NULL || L->adj == NULL)
+        return 0;
+
     struct graph **aux = L->adj, *G, *g;
 
     for(int n = 0; n < L->size_lines; n++)
@@ -205,37 +216,139 @@ bool graphLoop(struct list *L)
 return 0;
 }
 
+//3)
+bool graphParalel(struct list *L)
+{
+    if(L == NULL || L->adj == NULL)
+        return 0;
+
+    struct graph **aux = L->adj, *G, *g;
+    char ref[2];
+    int paralel = 0;
+
+    for(int line = 0; line < L->size_lines; line++)
+    {
+        G = aux[line];
+        g = G->next;
+        ref[0] = G->individuo;
+        ref[1] = g->individuo;
+
+        for(int ln = (line+1); ln < L->size_lines; ln++)
+        {
+            G = aux[ln];
+            g = G->next;
+
+            if((ref[0] == G->individuo && ref[1] == g->individuo) || (ref[0] == g->individuo && ref[1] == G->individuo))
+                return 1;
+        }
+    }
+return 0;
+}
+
 //4)
 void graphDegree(struct list *L)
 {
+    if(L == NULL || L->adj == NULL)
+        return;
+
     struct graph **aux = L->adj, *G, *g;
     char matriz[L->size_vertex][2];
 
-    for(int n = 0; n < L->size_vertex; n++)
+    for(int line = 0; line < L->size_vertex; line++)
     {
-        matriz[n][0] = L->buffer_vertex[n];
-        matriz[n][1] = '0';
+        matriz[line][0] = L->buffer_vertex[line];
+        matriz[line][1] = '0';
     }
 
-    for(int b = 0; b < L->size_vertex; b++)
+    for(int line_v = 0; line_v < L->size_vertex; line_v++)
     {
-        for(int n = 0; n < L->size_lines; n++)
+        for(int line_g = 0; line_g < L->size_lines; line_g++)
         {
-            G = aux[n];
+            G = aux[line_g];
             g = G->next;
             
-            if(matriz[b][0] == G->individuo || matriz[b][0] == g->individuo)
+            if(matriz[line_v][0] == G->individuo || matriz[line_v][0] == g->individuo)
             {
-                matriz[b][1]++;
+                matriz[line_v][1]++;
                 
                 if(G->individuo == g->individuo)
-                    matriz[b][1]++;
+                    matriz[line_v][1]++;
             }
         }
     }
     for(int n = 0; n < L->size_vertex; n++)
         printf("VERTICE[%c] - GRAU[%d]\n", matriz[n][0], matriz[n][1] - 48);
 }
+
+//5)
+void graphMinMaxDegree(struct list *L)
+{
+    if(L == NULL || L->adj == NULL)
+        return;
+
+    struct graph **aux = L->adj, *G, *g;
+    char matriz[L->size_vertex][2];
+    char min, max, position[2];
+
+    for(int line = 0; line < L->size_vertex; line++)
+    {
+        matriz[line][0] = L->buffer_vertex[line];
+        matriz[line][1] = '0';
+    }
+
+    for(int line_v = 0; line_v < L->size_vertex; line_v++)
+    {
+        for(int line_g = 0; line_g < L->size_lines; line_g++)
+        {
+            G = aux[line_g];
+            g = G->next;
+            
+            if(matriz[line_v][0] == G->individuo || matriz[line_v][0] == g->individuo)
+            {
+                matriz[line_v][1]++;
+                
+                if(G->individuo == g->individuo)
+                    matriz[line_v][1]++;
+            }
+        }
+    }
+
+    min = matriz[1][1];
+    max = matriz[1][1];
+
+    for(int line = 0; line < L->size_vertex; line++)
+    {
+        if(matriz[line][1] < min)
+        {
+            min = matriz[line][1];
+            position[0] = line;
+        }
+
+        if(matriz[line][1] > max)
+        {
+            max = matriz[line][1];
+            position[1] = line;
+        }
+    }
+
+printf("Min> [%c] - [%d]\nMax> [%c] - [%d]\n", matriz[position[0]][0], matriz[position[0]][1]-48, matriz[position[1]][0], matriz[position[1]][1]-48);
+}
+
+//6)
+int graphOrdem(struct list *L)
+{
+    return L->size_vertex;
+}
+
+//7)
+bool graphSimples(struct list *L)
+{
+    if((graphParalel(L) != 0) && (graphLoop(L) != 0))
+        return 1;
+
+return 0;
+}
+
 
 
 int main(){
@@ -254,13 +367,29 @@ int main(){
     graphPopulate(&L, arq);
     fclose(arq);
     graphPrint(L);
-    
+
+    //2)
     if(graphLoop(L))
         printf("\n- Possui Loop -\n");
 
+    //3)
+    if(graphParalel(L))
+        printf("\n- Possui arestas paralelas -\n");
+    
+    //4)
     graphDegree(L);
     
+    //5)
+    graphMinMaxDegree(L);
+
+    //6)
+    printf("\nOrdem do grafo> %d\n", graphOrdem(L));
     
+    //7)
+    if(graphSimples(L))
+        printf("\n - Grafo simples -\n");
+
+
     listFree(&L);
 
 return 0;   

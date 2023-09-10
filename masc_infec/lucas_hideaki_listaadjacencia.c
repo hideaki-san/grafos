@@ -16,12 +16,12 @@ int size;
 
 
 struct list *listInit(int lines);
-int num_lines(char *name_arq);
 struct graph *graphAdd(char individuo, int estado);
-void listFree(struct list **L);
-void graphPrint(struct list *L);
+int num_lines(char *name_arq);
 void graphPopulate(struct list **L, FILE *arq);
+void graphPrint(struct list *L);
 void conditional(int a, int b);
+void listFree(struct list **L);
 
 
 struct list *listInit(int lines)
@@ -36,6 +36,15 @@ struct list *listInit(int lines)
   return L;
 }
 
+struct graph *graphAdd(char individuo, int estado){
+
+  struct graph *G =(struct graph *)malloc(sizeof(struct graph));
+  G->individuo = individuo;
+  G->estado = estado - 48; //para ajeitar o valor referente a tabela ASCII
+  G->next = NULL;
+
+return G;
+}
 
 int num_lines(char *name_arq){
   
@@ -58,15 +67,6 @@ int num_lines(char *name_arq){
 return lines;
 }
 
-struct graph *graphAdd(char individuo, int estado){
-
-  struct graph *G =(struct graph *)malloc(sizeof(struct graph));
-  G->individuo = individuo;
-  G->estado = estado - 48; //para ajeitar o valor referente a tabela ASCII
-  G->next = NULL;
-
-return G;
-}
 
 void graphPopulate(struct list **L, FILE *arq){
    
