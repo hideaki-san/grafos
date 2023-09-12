@@ -20,7 +20,8 @@ struct graph *graphAdd(char individuo, int estado);
 int num_lines(char *name_arq);
 void graphPopulate(struct list **L, FILE *arq);
 void graphPrint(struct list *L);
-void conditional(int a, int b);
+void conditional(FILE *arq, int a, int b);
+void graphTxtGen(struct list *L);
 void listFree(struct list **L);
 
 
@@ -40,7 +41,7 @@ struct graph *graphAdd(char individuo, int estado){
 
   struct graph *G =(struct graph *)malloc(sizeof(struct graph));
   G->individuo = individuo;
-  G->estado = estado - 48; //para ajeitar o valor referente a tabela ASCII
+  G->estado = estado - 48;
   G->next = NULL;
 
 return G;
@@ -119,24 +120,13 @@ void graphPrint(struct list *L){
     return;
 
   struct graph *g;
-  int state[2], state_controller = 0;
 
   for(int n = 0; n < L->size; n++){
     g = L->adj[n];
     while(g != NULL){
       printf("%c,%d  ", g->individuo, g->estado);
-
-      if(state_controller < 2){
-        state[state_controller] = g->estado;
-        state_controller++;
-      }
-
       g = g->next;
     }
-  if(state_controller == 2)
-    conditional(state[0], state[1]);
-  
-  state_controller = 0;
   printf("\n");
   }
 }
@@ -148,25 +138,59 @@ void graphPrint(struct list *L){
 4 - Sem máscara, com infecção da COVID-19
 */
 
-void conditional(int a, int b){
+void conditional(FILE *arq, int a, int b){
 
   if((a == 1 && b == 1)||(a == 1 && b == 2)||(a == 2 && b == 1)||(a == 2 && b == 2)){
-      printf("== 0%%");
-    } 
+    fprintf(arq, "== 0%%");
+  } 
   
   if((a == 2 && b == 3) || (a == 3 && b == 2)){
-    printf("== 25%%");
+    fprintf(arq, "== 25%%");
   }
 
   if(((a == 1 && b == 3) || (a== 3 && b == 1)) || ((a == 2 && b == 4) || (a == 4 && b == 2))){
-    printf("== 50%%");
+    fprintf(arq, "== 50%%");
   }
 
   if((a == 1 && b == 4) || (a == 4 && b == 1)){
-    printf("== 100%%");
+    fprintf(arq, "== 100%%");
   }
 }
 
+void graphTxtGen(struct list *L)
+{
+  if(L == NULL || L->adj == NULL)
+    return;
+
+  FILE *txt = fopen("probabilidade.txt", "w");
+
+  if(txt == NULL)
+    return;
+
+  struct graph *g;
+  int state[2], state_controller = 0;
+
+  for(int n = 0; n < L->size; n++){
+    g = L->adj[n];
+    while(g != NULL){
+      fprintf(txt, "%c,%d  ", g->individuo, g->estado);
+
+      if(state_controller < 2){
+        state[state_controller] = g->estado;
+        state_controller++;
+      }
+
+      g = g->next;
+    }
+  if(state_controller == 2)
+    conditional(txt, state[0], state[1]);
+  
+  state_controller = 0;
+  fprintf(txt, "\n");
+  }
+
+fclose(txt);
+}
 
 void listFree(struct list **L)
 {
@@ -209,6 +233,7 @@ int main(){
   fclose(arq);
   
   graphPrint(L);
+  graphTxtGen(L);
   listFree(&L);
 
 return 0;   

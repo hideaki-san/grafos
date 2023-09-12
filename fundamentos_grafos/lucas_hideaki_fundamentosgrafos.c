@@ -23,6 +23,7 @@ int num_lines(char *name_arq);
 void graphPopulate(struct list **L, FILE *arq);
 void graphPrint(struct list *L);
 void listFree(struct list **L);
+int fatorial(int fat);
 
 //bool graphConexo(struct list *L);
 bool graphLoop(struct list *L);
@@ -31,6 +32,8 @@ bool graphParalel(struct list *L);
 void graphMinMaxDegree(struct list *L);
 int graphOrdem(struct list *L);
 bool graphSimples(struct list *L);
+bool graphMultigrafo(struct list *L);
+bool graphCompleto(struct list *L);
 
 
 struct list *listInit(int lines)
@@ -197,6 +200,14 @@ void listFree(struct list **L)
     (*L) = NULL;
 }
 
+int fatorial(int fat)
+{
+    for(int n = (fat-1); n > 1; n--)    
+        fat *= n;
+
+return fat;
+}
+
 //2)
 bool graphLoop(struct list *L)
 { 
@@ -337,18 +348,50 @@ printf("Min> [%c] - [%d]\nMax> [%c] - [%d]\n", matriz[position[0]][0], matriz[po
 //6)
 int graphOrdem(struct list *L)
 {
+    if(L == NULL || L->adj == NULL)
+        return 0;
+
     return L->size_vertex;
 }
 
 //7)
 bool graphSimples(struct list *L)
 {
-    if((graphParalel(L) != 0) && (graphLoop(L) != 0))
+    if(L == NULL || L->adj == NULL)
+        return 0; 
+
+    if(graphParalel(L) || graphLoop(L))
+        return 0;
+
+return 1;
+}
+
+//8)
+bool graphMultigrafo(struct list *L)
+{
+    if(L == NULL || L->adj == NULL)
+        return 0;
+
+    if(graphParalel(L) || graphLoop(L))
         return 1;
 
 return 0;
 }
 
+//9)
+bool graphCompleto(struct list *L)
+{
+    if(L == NULL || L->adj == NULL)
+        return 0;
+
+    if(graphSimples(L))
+    {
+        if(L->size_lines == fatorial(L->size_vertex)/(fatorial(L->size_vertex - 2)*fatorial(2)))
+            return 1;
+    }
+
+return 0;
+}
 
 
 int main(){
@@ -359,7 +402,8 @@ int main(){
     
     FILE *arq = fopen("completok4.dot", "r");
     
-    if(arq == NULL){
+    if(arq == NULL)
+    {
         printf("erro.\n");
         return 1;
     }
@@ -389,6 +433,14 @@ int main(){
     if(graphSimples(L))
         printf("\n - Grafo simples -\n");
 
+    //8)
+    if(graphMultigrafo(L))
+        printf("\n - Eh um multigrafo -\n");
+
+    //9))
+    if(graphCompleto(L))
+        printf("\n - Grafo Completo -\n");
+  
 
     listFree(&L);
 
