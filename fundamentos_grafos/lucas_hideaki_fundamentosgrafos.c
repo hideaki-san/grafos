@@ -27,13 +27,14 @@ int fatorial(int fat);
 
 //bool graphConexo(struct list *L);
 bool graphLoop(struct list *L);
-void graphDegree(struct list *L);
-bool graphParalel(struct list *L);
-void graphMinMaxDegree(struct list *L);
+void graphGrau(struct list *L);
+bool graphParalelo(struct list *L);
+void graphMinMaxGrau(struct list *L);
 int graphOrdem(struct list *L);
 bool graphSimples(struct list *L);
 bool graphMultigrafo(struct list *L);
 bool graphCompleto(struct list *L);
+bool graphRegular(struct list *L);
 
 
 struct list *listInit(int lines)
@@ -228,7 +229,7 @@ return 0;
 }
 
 //3)
-bool graphParalel(struct list *L)
+bool graphParalelo(struct list *L)
 {
     if(L == NULL || L->adj == NULL)
         return 0;
@@ -257,7 +258,7 @@ return 0;
 }
 
 //4)
-void graphDegree(struct list *L)
+void graphGrau(struct list *L)
 {
     if(L == NULL || L->adj == NULL)
         return;
@@ -279,12 +280,8 @@ void graphDegree(struct list *L)
             g = G->next;
             
             if(matriz[line_v][0] == G->individuo || matriz[line_v][0] == g->individuo)
-            {
                 matriz[line_v][1]++;
-                
-                if(G->individuo == g->individuo)
-                    matriz[line_v][1]++;
-            }
+            
         }
     }
     for(int n = 0; n < L->size_vertex; n++)
@@ -292,7 +289,7 @@ void graphDegree(struct list *L)
 }
 
 //5)
-void graphMinMaxDegree(struct list *L)
+void graphMinMaxGrau(struct list *L)
 {
     if(L == NULL || L->adj == NULL)
         return;
@@ -315,19 +312,14 @@ void graphMinMaxDegree(struct list *L)
             g = G->next;
             
             if(matriz[line_v][0] == G->individuo || matriz[line_v][0] == g->individuo)
-            {
                 matriz[line_v][1]++;
-                
-                if(G->individuo == g->individuo)
-                    matriz[line_v][1]++;
-            }
         }
     }
 
-    min = matriz[1][1];
-    max = matriz[1][1];
+    min = matriz[0][1];
+    max = matriz[0][1];
 
-    for(int line = 0; line < L->size_vertex; line++)
+    for(int line = 1; line < L->size_vertex; line++)
     {
         if(matriz[line][1] < min)
         {
@@ -342,7 +334,7 @@ void graphMinMaxDegree(struct list *L)
         }
     }
 
-printf("Min> [%c] - [%d]\nMax> [%c] - [%d]\n", matriz[position[0]][0], matriz[position[0]][1]-48, matriz[position[1]][0], matriz[position[1]][1]-48);
+printf("\nδ(G) = %d\n∆(G) = %d\n", matriz[position[0]][1]-48, matriz[position[1]][1]-48);
 }
 
 //6)
@@ -360,7 +352,7 @@ bool graphSimples(struct list *L)
     if(L == NULL || L->adj == NULL)
         return 0; 
 
-    if(graphParalel(L) || graphLoop(L))
+    if(graphParalelo(L) || graphLoop(L))
         return 0;
 
 return 1;
@@ -372,7 +364,7 @@ bool graphMultigrafo(struct list *L)
     if(L == NULL || L->adj == NULL)
         return 0;
 
-    if(graphParalel(L) || graphLoop(L))
+    if(graphParalelo(L) || graphLoop(L))
         return 1;
 
 return 0;
@@ -391,6 +383,42 @@ bool graphCompleto(struct list *L)
     }
 
 return 0;
+}
+
+//10)
+bool graphRegular(struct list *L)
+{
+    if(L == NULL || L->adj == NULL)
+        return 0;
+
+    struct graph **aux = L->adj, *G, *g;
+    char matriz[L->size_vertex][2];
+
+    for(int line = 0; line < L->size_vertex; line++)
+    {
+        matriz[line][0] = L->buffer_vertex[line];
+        matriz[line][1] = '0';
+    }
+
+    for(int line_v = 0; line_v < L->size_vertex; line_v++)
+    {
+        for(int line_g = 0; line_g < L->size_lines; line_g++)
+        {
+            G = aux[line_g];
+            g = G->next;
+            
+            if(matriz[line_v][0] == G->individuo || matriz[line_v][0] == g->individuo)
+                matriz[line_v][1]++;
+        }
+    }
+
+    for(int line_v = 0; line_v < L->size_vertex; line_v++)
+    {
+        if(matriz[0][1] != matriz[line_v][1])
+            return 0;
+    }
+
+return 1;
 }
 
 
@@ -417,14 +445,14 @@ int main(){
         printf("\n- Possui Loop -\n");
 
     //3)
-    if(graphParalel(L))
+    if(graphParalelo(L))
         printf("\n- Possui arestas paralelas -\n");
     
     //4)
-    graphDegree(L);
+    graphGrau(L);
     
     //5)
-    graphMinMaxDegree(L);
+    graphMinMaxGrau(L);
 
     //6)
     printf("\nOrdem do grafo> %d\n", graphOrdem(L));
@@ -440,9 +468,12 @@ int main(){
     //9))
     if(graphCompleto(L))
         printf("\n - Grafo Completo -\n");
-  
 
-    listFree(&L);
+    //10)
+    if(graphRegular(L))
+        printf("\n - Grafo Regular -\n");
 
+
+listFree(&L);
 return 0;   
 }
