@@ -1,3 +1,9 @@
+Significado das condições:
+[1]Sem máscara, sem infecção da COVID-19
+[2]Com máscara, sem infecção da COVID-19
+[3]Com máscara, com infecção da COVID-19
+[4]Sem máscara, com infecção da COVID-19
+
 A,1  A,1  == 0%
 A,1  B,2  == 0%
 A,1  C,3  == 50%

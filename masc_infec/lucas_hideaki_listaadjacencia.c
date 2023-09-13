@@ -167,6 +167,10 @@ void graphTxtGen(struct list *L)
   if(txt == NULL)
     return;
 
+  
+  fprintf(txt, "Significado das condições:\n");
+  fprintf(txt,"[1]Sem máscara, sem infecção da COVID-19\n[2]Com máscara, sem infecção da COVID-19\n[3]Com máscara, com infecção da COVID-19\n[4]Sem máscara, com infecção da COVID-19\n\n");
+  
   struct graph *g;
   int state[2], state_controller = 0;
 
