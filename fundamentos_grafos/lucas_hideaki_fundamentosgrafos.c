@@ -30,10 +30,10 @@ void graphGrau(struct list *L);
 bool graphParalelo(struct list *L);
 void graphMinMaxGrau(struct list *L);
 int graphOrdem(struct list *L);
-// bool graphSimples(struct list *L);
-// bool graphMultigrafo(struct list *L);
-// bool graphCompleto(struct list *L);
-// bool graphRegular(struct list *L);
+bool graphSimples(struct list *L);
+bool graphMultigrafo(struct list *L);
+bool graphCompleto(struct list *L);
+bool graphRegular(struct list *L);
 
 
 struct list *listInit(char *name_arq)
