@@ -1,14 +1,13 @@
-Significado das condições:
-[1]Sem máscara, sem infecção da COVID-19
-[2]Com máscara, sem infecção da COVID-19
-[3]Com máscara, com infecção da COVID-19
-[4]Sem máscara, com infecção da COVID-19
+[0]Sem máscara, sem infecção da COVID-19
+[1]Com máscara, sem infecção da COVID-19
+[2]Com máscara, com infecção da COVID-19
+[3]Sem máscara, com infecção da COVID-19
 
-A,1  A,1  == 0%
-A,1  B,2  == 0%
-A,1  C,3  == 50%
-A,1  D,4  == 100%
-B,2  A,1  == 0%
-B,2  B,2  == 0%
-B,2  C,3  == 25%
-B,2  D,4  == 50%
+VERTICE ANALISADO [A|0]: A,0  == 0%
+VERTICE ANALISADO [A|0]: B,1  == 0%
+VERTICE ANALISADO [A|0]: C,2  == 50%
+VERTICE ANALISADO [A|0]: D,3  == 100%
+VERTICE ANALISADO [B|1]: A,0  == 0%
+VERTICE ANALISADO [B|1]: B,1  == 0%
+VERTICE ANALISADO [B|1]: C,2  == 25%
+VERTICE ANALISADO [B|1]: D,3  == 50%
